@@ -1,0 +1,42 @@
+[
+    {
+        "name": "PadPoint Central",
+        "lat": 12.971598,
+        "lon": 77.594566,
+        "open": true,
+        "accessible": true,
+        "stocked": true
+    },
+    {
+        "name": "QuickPads Mall",
+        "lat": 12.975000,
+        "lon": 77.592000,
+        "open": true,
+        "accessible": false,
+        "stocked": true
+    },
+    {
+        "name": "SafeHygiene Hub",
+        "lat": 12.969000,
+        "lon": 77.597000,
+        "open": false,
+        "accessible": true,
+        "stocked": false
+    },
+    {
+        "name": "HygieneStore Park",
+        "lat": 12.973500,
+        "lon": 77.595200,
+        "open": true,
+        "accessible": true,
+        "stocked": false
+    },
+    {
+        "name": "Feminine Care Plaza",
+        "lat": 12.972200,
+        "lon": 77.596800,
+        "open": false,
+        "accessible": true,
+        "stocked": true
+    }
+]
