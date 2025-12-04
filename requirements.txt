@@ -1,23 +1,20 @@
 # ==============================
 # Vending Machine Locator App
-# Fully compatible with Python 3.12+
+# Compatible with Python 3.11+
 # ==============================
 
-# Core dependencies
+# Streamlit for UI
 streamlit==1.28.0
-folium==0.20.0
+
+# Folium for maps
+folium==0.19.7
+
+# Streamlit-Folium bridge
 streamlit-folium==0.25.3
 
+# Utilities (used in code)
+pandas==2.1.1
+numpy==1.26.4
 
-
-
-
-
-# ------------------------
-# Instructions:
-# To install all dependencies at once, run:
-# pip install -r requirements.txt
-# ------------------------
-
-
-
+# JSON, CSV, OS, Math, built-in in Python 3
+# No need to install separately
