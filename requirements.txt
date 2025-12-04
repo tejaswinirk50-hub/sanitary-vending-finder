@@ -3,23 +3,12 @@
 # Fully compatible with Python 3.12+
 # ==============================
 
-# Streamlit for web UI
+# Core dependencies
 streamlit==1.28.0
 folium==0.17.1
 streamlit-folium==0.11.4
 
-
-# JSON is built-in in Python, no need to install separately
-# CSV and SQLite are built-in as well
-
-# Optional: if using streamlit_javascript (not required with HTML approach)
-# streamlit_javascript==0.1.4
-
-# Other dependencies (installed automatically with above packages)
-# Jinja2 (used by Streamlit)
-# MarkupSafe
-# Altair (Streamlit visualization)
-# pandas (if you later expand with CSV/Excel handling)
+# Optional for future data handling
 pandas==2.1.1
 numpy==1.27.5
 
