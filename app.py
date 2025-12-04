@@ -5,6 +5,9 @@ from math import radians, cos, sin, asin, sqrt
 import json
 import os
 
+# NEW: For live geolocation
+from streamlit_js_eval import get_geolocation
+
 # -----------------------
 # Page Config and Header
 # -----------------------
@@ -25,16 +28,17 @@ You can also **add new vending machine locations** which will be saved locally.
 )
 st.markdown("---")
 
+
 # -----------------------
 # Constants
 # -----------------------
 JSON_FILE = "vending_machines.json"
 
+
 # -----------------------
 # Utilities
 # -----------------------
 def haversine(lat1, lon1, lat2, lon2):
-    """Calculate distance in km between two lat/lon points"""
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
     dlat = lat2 - lat1
@@ -42,8 +46,8 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * asin(sqrt(a))
     return 6371 * c
 
+
 def load_locations():
-    """Load vending machine data from JSON, create sample if missing"""
     if not os.path.exists(JSON_FILE):
         sample_data = [
             {"name": "PadPoint Central", "lat": 12.971598, "lon": 77.594566, "open": True, "accessible": True, "stocked": True},
@@ -53,6 +57,7 @@ def load_locations():
         with open(JSON_FILE, "w") as f:
             json.dump(sample_data, f, indent=4)
         return sample_data
+
     with open(JSON_FILE, "r") as f:
         try:
             data = json.load(f)
@@ -60,19 +65,32 @@ def load_locations():
         except json.JSONDecodeError:
             return []
 
+
 def save_location(vm):
-    """Append a new vending machine to JSON"""
     data = load_locations()
     data.append(vm)
     with open(JSON_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
+
 # -----------------------
 # Sidebar Inputs
 # -----------------------
-st.sidebar.header("Your Location")
-user_lat = st.sidebar.number_input("Latitude", value=12.9716, format="%.6f")
-user_lon = st.sidebar.number_input("Longitude", value=77.5946, format="%.6f")
+st.sidebar.header("Your Live Location")
+
+# 🔥 NEW: GET LIVE BROWSER GPS
+loc = get_geolocation()
+
+if loc is not None:
+    user_lat = loc['coords']['latitude']
+    user_lon = loc['coords']['longitude']
+    st.sidebar.success(f"📍 Live location detected!")
+    st.sidebar.write(f"Lat: {user_lat:.6f}")
+    st.sidebar.write(f"Lon: {user_lon:.6f}")
+else:
+    st.sidebar.warning("Live location blocked or not available. Enter manually:")
+    user_lat = st.sidebar.number_input("Latitude", value=12.9716, format="%.6f")
+    user_lon = st.sidebar.number_input("Longitude", value=77.5946, format="%.6f")
 
 st.sidebar.header("Filters / Search")
 radius_km = st.sidebar.slider("Radius (km)", 1, 20, 5)
@@ -106,14 +124,17 @@ with st.sidebar.form("add_form"):
             st.sidebar.success(f"{name} added successfully!")
             st.sidebar.info("Refresh the app (F5) to see the updated vending machine list.")
 
+
 # -----------------------
 # Load & Filter Vending Machines
 # -----------------------
 vending_machines = load_locations()
 filtered = []
+
 for vm in vending_machines:
     vm_distance = haversine(user_lat, user_lon, vm["lat"], vm["lon"])
     vm["distance"] = vm_distance
+
     if vm_distance > radius_km:
         continue
     if search_term and search_term not in vm["name"].lower():
@@ -128,14 +149,20 @@ for vm in vending_machines:
 
 filtered.sort(key=lambda x: x["distance"])
 
+
 # -----------------------
-# Map Display (using folium_static)
+# Map Display
 # -----------------------
 m = folium.Map(location=[user_lat, user_lon], zoom_start=15)
-# User marker
-folium.Marker([user_lat, user_lon], tooltip="You are here", icon=folium.Icon(color="blue")).add_to(m)
 
-# Vending machine markers (red)
+# User marker
+folium.Marker(
+    [user_lat, user_lon],
+    tooltip="You are here",
+    icon=folium.Icon(color="blue")
+).add_to(m)
+
+# Vending markers
 for vm in filtered:
     folium.Marker(
         location=[vm["lat"], vm["lon"]],
@@ -147,8 +174,9 @@ for vm in filtered:
 st.subheader(f"Nearby Vending Machines ({len(filtered)})")
 folium_static(m, width=750, height=500)
 
+
 # -----------------------
-# Streamlit-native Card UI
+# Details Cards
 # -----------------------
 st.subheader("Vending Machines Details")
 if filtered:
