@@ -1,6 +1,6 @@
 import streamlit as st
 import folium
-from streamlit_folium import st_folium
+from streamlit_folium import folium_static
 from math import radians, cos, sin, asin, sqrt
 import json
 import os
@@ -30,7 +30,6 @@ st.markdown("---")
 # -----------------------
 JSON_FILE = "vending_machines.json"
 
-
 # -----------------------
 # Utilities
 # -----------------------
@@ -43,17 +42,13 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * asin(sqrt(a))
     return 6371 * c
 
-
 def load_locations():
     """Load vending machine data from JSON, create sample if missing"""
     if not os.path.exists(JSON_FILE):
         sample_data = [
-            {"name": "PadPoint Central", "lat": 12.971598, "lon": 77.594566, "open": True, "accessible": True,
-             "stocked": True},
-            {"name": "QuickPads Mall", "lat": 12.975000, "lon": 77.592000, "open": True, "accessible": False,
-             "stocked": True},
-            {"name": "SafeHygiene Hub", "lat": 12.969000, "lon": 77.597000, "open": False, "accessible": True,
-             "stocked": False}
+            {"name": "PadPoint Central", "lat": 12.971598, "lon": 77.594566, "open": True, "accessible": True, "stocked": True},
+            {"name": "QuickPads Mall", "lat": 12.975000, "lon": 77.592000, "open": True, "accessible": False, "stocked": True},
+            {"name": "SafeHygiene Hub", "lat": 12.969000, "lon": 77.597000, "open": False, "accessible": True, "stocked": False}
         ]
         with open(JSON_FILE, "w") as f:
             json.dump(sample_data, f, indent=4)
@@ -65,14 +60,12 @@ def load_locations():
         except json.JSONDecodeError:
             return []
 
-
 def save_location(vm):
     """Append a new vending machine to JSON"""
     data = load_locations()
     data.append(vm)
     with open(JSON_FILE, "w") as f:
         json.dump(data, f, indent=4)
-
 
 # -----------------------
 # Sidebar Inputs
@@ -136,7 +129,7 @@ for vm in vending_machines:
 filtered.sort(key=lambda x: x["distance"])
 
 # -----------------------
-# Map Display
+# Map Display (using folium_static)
 # -----------------------
 m = folium.Map(location=[user_lat, user_lon], zoom_start=15)
 # User marker
@@ -152,25 +145,21 @@ for vm in filtered:
     ).add_to(m)
 
 st.subheader(f"Nearby Vending Machines ({len(filtered)})")
-st_folium(m, width=700, height=500)
+folium_static(m, width=750, height=500)
 
 # -----------------------
 # Streamlit-native Card UI
 # -----------------------
 st.subheader("Vending Machines Details")
-
 if filtered:
     for vm in filtered:
         with st.container():
             st.markdown(f"### {vm['name']}")
             st.markdown(f"**Distance:** {vm['distance']:.2f} km")
-
-            # Status badges in three columns
             col1, col2, col3 = st.columns(3)
             col1.markdown(f"**Open:** {'✅' if vm.get('open', True) else '❌'}")
             col2.markdown(f"**Accessible:** {'✅' if vm.get('accessible', True) else '❌'}")
             col3.markdown(f"**Stocked:** {'✅' if vm.get('stocked', True) else '❌'}")
-
-            st.markdown("---")  # Separator between cards
+            st.markdown("---")
 else:
     st.write("No vending machines found in the selected radius with current filters.")
