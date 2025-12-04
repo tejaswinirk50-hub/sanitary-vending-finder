@@ -9,12 +9,17 @@ folium==0.20.0
 streamlit-folium==0.25.3
 
 # Optional for future data handling
-pandas==2.0.3
+pandas==2.1.1
 numpy==1.26.4
+
+
+
+
 
 # ------------------------
 # Instructions:
 # To install all dependencies at once, run:
 # pip install -r requirements.txt
 # ------------------------
+
 
